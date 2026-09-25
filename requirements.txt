@@ -1,0 +1,15 @@
+pandas
+numpy
+scikit-learn
+xgboost
+lightgbm
+mlflow
+dvc
+fastapi
+uvicorn
+pydantic
+joblib
+pytest
+httpx
+flake8
+streamlit

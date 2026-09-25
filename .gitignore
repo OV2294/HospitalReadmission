@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+*.egg-info/
+.venv/
+venv/
+
+# MLflow
+mlruns/
+mlartifacts/
+mlflow.db
+
+# DVC-managed data (tracked via .dvc pointer files instead)
+/data/raw/readmission_raw.csv
+/data/processed/readmission_features.csv
+
+# Editor/OS
+.vscode/
+.idea/
+.DS_Store
+
+# Env
+.env

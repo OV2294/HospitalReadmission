@@ -1,0 +1,29 @@
+stages:
+  preprocess:
+    cmd: python src/preprocessing.py --input data/raw/readmission_raw.csv --output data/processed/readmission_features.csv --encoder-out models/preprocessor.pkl
+    deps:
+      - src/preprocessing.py
+      - data/raw/readmission_raw.csv
+    outs:
+      - data/processed/readmission_features.csv
+      - models/preprocessor.pkl
+
+  train:
+    cmd: python src/train.py --features data/processed/readmission_features.csv
+    deps:
+      - src/train.py
+      - data/processed/readmission_features.csv
+    params:
+      - train.min_recall
+
+  evaluate:
+    cmd: python src/evaluate.py --min-recall ${train.min_recall}
+    deps:
+      - src/evaluate.py
+
+  select_best_model:
+    cmd: python src/select_best_model.py --min-recall ${train.min_recall}
+    deps:
+      - src/select_best_model.py
+    outs:
+      - models/best_model.pkl

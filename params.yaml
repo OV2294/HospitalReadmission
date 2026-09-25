@@ -1,0 +1,8 @@
+train:
+  min_recall: 0.45
+
+data:
+  raw_path: data/raw/readmission_raw.csv
+  processed_path: data/processed/readmission_features.csv
+  test_size: 0.2
+  random_state: 42
