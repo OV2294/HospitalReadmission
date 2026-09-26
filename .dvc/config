@@ -1,0 +1,4 @@
+[core]
+    remote = origin
+['remote "origin"']
+    url = https://github.com/OV2294/HospitalReadmission.git
