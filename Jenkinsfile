@@ -19,14 +19,14 @@ pipeline {
             }
         }
 
-        stage('Pull dataset with DVC') {
-            steps {
-                bat '''
-                    call %VENV_DIR%/Scripts/activate.bat
-                    dvc pull
-                '''
-            }
-        }
+        // stage('Pull dataset with DVC') {
+        //     steps {
+        //         bat '''
+        //             call %VENV_DIR%/Scripts/activate.bat
+        //             dvc pull
+        //         '''
+        //     }
+        // }
 
         stage('Reproduce DVC pipeline') {
             steps {
