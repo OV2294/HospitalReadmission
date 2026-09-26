@@ -3,6 +3,8 @@ pipeline {
 
     environment {
         VENV_DIR = '.venv'
+        // TODO: replace with the exact path 'where python' gave you
+        PYTHON_EXE = 'C:\\Users\\YourName\\AppData\\Local\\Programs\\Python\\Python312\\python.exe'
     }
 
     stages {
@@ -16,7 +18,7 @@ pipeline {
         stage('Set up Python environment') {
             steps {
                 bat '''
-                    python -m venv %VENV_DIR%
+                    "%PYTHON_EXE%" -m venv %VENV_DIR%
                     call %VENV_DIR%\\Scripts\\activate.bat
                     python -m pip install --upgrade pip
                     pip install -r requirements.txt
