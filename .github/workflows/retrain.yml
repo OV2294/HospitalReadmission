@@ -1,0 +1,54 @@
+name: Automatic Retraining
+
+on:
+  schedule:
+    # Every Sunday at 02:00 UTC — matches how often new discharge batches
+    # are assumed to be exported from the hospital's records system.
+    - cron: "0 2 * * 0"
+  workflow_dispatch: {}   # allows manually triggering a retrain on demand
+  push:
+    paths:
+      - "data/raw/**"     # also retrain whenever a new data version is pushed
+
+jobs:
+  retrain:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Pull latest DVC-tracked dataset
+        run: dvc pull || echo "No DVC remote configured yet."
+
+      - name: Retrain all candidate models (logged to MLflow)
+        run: python src/train.py
+
+      - name: Performance gate
+        run: python src/evaluate.py --min-recall 0.45
+
+      - name: Select best model and promote if it beats current production
+        run: python src/select_best_model.py --min-recall 0.45
+
+      - name: Commit updated model + DVC lock file
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add dvc.lock models/*.dvc 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "Automatic retraining: update model [skip ci]"
+          git push || echo "Nothing to push"
+
+      - name: Push updated data/model artifacts to DVC remote
+        run: dvc push || echo "No DVC remote configured yet."
+
+      - name: Rebuild Docker image
+        run: docker build -t readmission-predictor:latest .
+        continue-on-error: true   # skip gracefully if no registry is configured yet

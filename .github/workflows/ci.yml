@@ -1,0 +1,53 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Pull dataset with DVC
+        run: |
+          dvc pull || echo "No DVC remote configured yet — using data already in the repo checkout."
+
+      - name: Lint
+        run: flake8 src/ api/ tests/ --max-line-length=100 --extend-ignore=E203,W503
+
+      - name: Run unit tests
+        run: pytest tests/ -v
+
+      - name: Reproduce DVC pipeline (train + evaluate + select best model)
+        run: dvc repro
+
+      - name: Enforce minimum performance gate
+        run: python src/evaluate.py --min-recall 0.45
+
+      - name: Upload model artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: best-model
+          path: |
+            models/best_model.pkl
+            models/preprocessor.pkl
