@@ -15,10 +15,10 @@ pipeline {
 
         stage('Set up Python environment') {
             steps {
-                sh '''
-                    python3 -m venv ${VENV_DIR}
-                    . ${VENV_DIR}/bin/activate
-                    pip install --upgrade pip
+                bat '''
+                    python -m venv %VENV_DIR%
+                    call %VENV_DIR%\\Scripts\\activate.bat
+                    python -m pip install --upgrade pip
                     pip install -r requirements.txt
                 '''
             }
@@ -26,17 +26,17 @@ pipeline {
 
         stage('Pull dataset with DVC') {
             steps {
-                sh '''
-                    . ${VENV_DIR}/bin/activate
-                    dvc pull || echo "No DVC remote configured yet — using data already in the workspace."
+                bat '''
+                    call %VENV_DIR%\\Scripts\\activate.bat
+                    dvc pull || echo No DVC remote configured yet -- using data already in the workspace.
                 '''
             }
         }
 
         stage('Lint') {
             steps {
-                sh '''
-                    . ${VENV_DIR}/bin/activate
+                bat '''
+                    call %VENV_DIR%\\Scripts\\activate.bat
                     flake8 src/ api/ tests/ --max-line-length=100 --extend-ignore=E203,W503
                 '''
             }
@@ -44,8 +44,8 @@ pipeline {
 
         stage('Run unit tests') {
             steps {
-                sh '''
-                    . ${VENV_DIR}/bin/activate
+                bat '''
+                    call %VENV_DIR%\\Scripts\\activate.bat
                     pytest tests/ -v
                 '''
             }
@@ -53,8 +53,8 @@ pipeline {
 
         stage('Reproduce DVC pipeline') {
             steps {
-                sh '''
-                    . ${VENV_DIR}/bin/activate
+                bat '''
+                    call %VENV_DIR%\\Scripts\\activate.bat
                     dvc repro
                 '''
             }
@@ -62,8 +62,8 @@ pipeline {
 
         stage('Enforce recall gate') {
             steps {
-                sh '''
-                    . ${VENV_DIR}/bin/activate
+                bat '''
+                    call %VENV_DIR%\\Scripts\\activate.bat
                     python src/evaluate.py --min-recall 0.45
                 '''
             }
@@ -77,17 +77,17 @@ pipeline {
 
         stage('Build Docker image') {
             steps {
-                sh 'docker build -t hospital-readmission-api .'
+                bat 'docker build -t hospital-readmission-api .'
             }
         }
     }
 
     post {
         success {
-            echo 'Pipeline completed successfully — model trained, evaluated, and image built.'
+            echo 'Pipeline completed successfully -- model trained, evaluated, and image built.'
         }
         failure {
-            echo 'Pipeline failed — check the stage logs above.'
+            echo 'Pipeline failed -- check the stage logs above.'
         }
     }
 }
