@@ -26,15 +26,6 @@ pipeline {
             }
         }
 
-        stage('Pull dataset with DVC') {
-            steps {
-                bat '''
-                    call %VENV_DIR%/Scripts/activate.bat
-                    dvc pull || echo No DVC remote configured yet -- using data already in the workspace.
-                '''
-            }
-        }
-
 
         stage('Reproduce DVC pipeline') {
             steps {
