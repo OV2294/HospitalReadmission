@@ -3,17 +3,10 @@ pipeline {
 
     environment {
         VENV_DIR = '.venv'
-        // TODO: replace with the exact path 'where python' gave you
         PYTHON_EXE = 'C:/Users/omkar/AppData/Local/Programs/Python/Python314/python.exe'
     }
 
     stages {
-
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
 
         stage('Set up Python environment') {
             steps {
@@ -26,6 +19,14 @@ pipeline {
             }
         }
 
+        stage('Pull dataset with DVC') {
+            steps {
+                bat '''
+                    call %VENV_DIR%/Scripts/activate.bat
+                    dvc pull
+                '''
+            }
+        }
 
         stage('Reproduce DVC pipeline') {
             steps {
@@ -47,15 +48,17 @@ pipeline {
 
         stage('Archive model artifacts') {
             steps {
-                archiveArtifacts artifacts: 'models/best_model.pkl, models/preprocessor.pkl', fingerprint: true
+                archiveArtifacts artifacts: 'models/best_model.pkl, models/preprocessor.pkl',
+                    fingerprint: true
             }
         }
     }
 
     post {
         success {
-            echo 'Pipeline completed successfully -- model trained, evaluated, and image built.'
+            echo 'Pipeline completed successfully -- model trained, evaluated, and artifacts archived.'
         }
+
         failure {
             echo 'Pipeline failed -- check the stage logs above.'
         }
