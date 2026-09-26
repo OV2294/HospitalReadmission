@@ -4,7 +4,7 @@ pipeline {
     environment {
         VENV_DIR = '.venv'
         // TODO: replace with the exact path 'where python' gave you
-        PYTHON_EXE = 'C:\\Users\\YourName\\AppData\\Local\\Programs\\Python\\Python312\\python.exe'
+        PYTHON_EXE = 'C:/Users/omkar/AppData/Local/Programs/Python/Python314/python.exe'
     }
 
     stages {

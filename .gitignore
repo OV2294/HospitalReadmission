@@ -1,25 +1,65 @@
+# ============================================================
 # Python
+# ============================================================
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
+*.pyd
 .pytest_cache/
 *.egg-info/
+
+# Virtual environments
 .venv/
 venv/
+env/
+ENV/
 
+# ============================================================
+# Environment / Secrets
+# ============================================================
+.env
+.env.*
+!.env.example
+
+# ============================================================
+# IDE / OS
+# ============================================================
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# ============================================================
 # MLflow
+# ============================================================
 mlruns/
 mlartifacts/
 mlflow.db
 
-# DVC-managed data (tracked via .dvc pointer files instead)
-/data/raw/readmission_raw.csv
-/data/processed/readmission_features.csv
+# ============================================================
+# DVC
+# ============================================================
+.dvc/cache/
+.dvc/tmp/
 
-# Editor/OS
-.vscode/
-.idea/
-.DS_Store
+# DVC-managed datasets
+data/raw/readmission_raw.csv
+data/processed/readmission_features.csv
 
-# Env
-.env
+# ============================================================
+# Temporary / Generated files
+# ============================================================
+*.log
+*.tmp
+*.bak
+
+# ============================================================
+# Jupyter
+# ============================================================
+.ipynb_checkpoints/
+
+# ============================================================
+# Model experiment outputs
+# Keep final model artifacts in models/
+# ============================================================
+# models/*.pkl
